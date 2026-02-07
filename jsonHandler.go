@@ -25,8 +25,6 @@ type npsBody struct {
 			} `json:"phoneNumbers"`
 		} `json:"contacts"`
 		EntranceFees   []any `json:"entranceFees"`
-		EntrancePasses []any `json:"entrancePasses"`
-		Fees           []any `json:"fees"`
 		OperatingHours []struct {
 			Exceptions    []any  `json:"exceptions"`
 			Description   string `json:"description"`
@@ -39,7 +37,6 @@ type npsBody struct {
 				Friday    string `json:"friday"`
 				Saturday  string `json:"saturday"`
 			} `json:"standardHours"`
-			Name string `json:"name"`
 		} `json:"operatingHours"`
 		Addresses []struct {
 			PostalCode            string `json:"postalCode"`
@@ -60,7 +57,6 @@ type npsBody struct {
 			URL     string `json:"url"`
 		} `json:"images"`
 		WeatherInfo string `json:"weatherInfo"`
-		Name        string `json:"name"`
 		Designation string `json:"designation"`
 		Multimedia  []struct {
 			Title string `json:"title"`
@@ -68,6 +64,5 @@ type npsBody struct {
 			Type  string `json:"type"`
 			URL   string `json:"url"`
 		} `json:"multimedia"`
-		RelevanceScore float64 `json:"relevanceScore"`
 	} `json:"data"`
 }
