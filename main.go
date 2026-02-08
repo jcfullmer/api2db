@@ -1,13 +1,14 @@
 package main
 
 import (
-	"fmt"
-	"io"
+	"database/sql"
 	"log"
 	"net/http"
 	"os"
 
+	"github.com/jcfullmer/api2db/internal/database"
 	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 )
 
 func main() {
@@ -17,9 +18,17 @@ func main() {
 		os.Exit(2)
 	}
 	apiKey := os.Getenv("API_KEY")
+	dbURL := os.Getenv("DB_URL")
+
+	db, err := sql.Open("postgres", dbURL)
+	if err != nil {
+		log.Fatalf("Error connecting to DB: %v", err)
+	}
+	dbQuery := database.New(db)
+
 	client := &http.Client{}
 	// requestURL := "https://developer.nps.gov/api/v1/newsreleases?limit=5"
-	requestURL := "https://developer.nps.gov/api/v1/parks?stateCode=ID"
+	requestURL := "https://developer.nps.gov/api/v1/parks?stateCode=ID&limit=1"
 
 	req, err := http.NewRequest(http.MethodGet, requestURL, nil)
 	req.Header.Add("X-Api-Key", apiKey)
@@ -40,10 +49,8 @@ func main() {
 		os.Exit(2)
 	}
 
-	body, err := io.ReadAll(resp.Body)
+	err = ResponseToDB(resp, dbQuery)
 	if err != nil {
-		log.Println(err)
-		os.Exit(2)
+		log.Fatalf("error putting response into database: %v", err)
 	}
-	fmt.Printf(string(body))
 }
