@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -10,6 +11,11 @@ import (
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
+
+type Config struct {
+	ApiKey  string
+	dbQuery *database.Queries
+}
 
 func main() {
 	err := godotenv.Load()
@@ -25,13 +31,27 @@ func main() {
 		log.Fatalf("Error connecting to DB: %v", err)
 	}
 	dbQuery := database.New(db)
+	config := Config{
+		ApiKey:  apiKey,
+		dbQuery: dbQuery,
+	}
+	limit := 50
+	start := 350
+	for start <= 2000 {
+		fmt.Println(start)
+		requestURL := fmt.Sprintf("https://developer.nps.gov/api/v1/parks?limit=%d&start=%d", limit, start)
+		err = config.RequestParseAdd(requestURL)
+		if err != nil {
+			log.Fatalf("%v\n", err)
+		}
+		start += 50
+	}
+}
 
+func (conf Config) RequestParseAdd(url string) error {
 	client := &http.Client{}
-	// requestURL := "https://developer.nps.gov/api/v1/newsreleases?limit=5"
-	requestURL := "https://developer.nps.gov/api/v1/parks?stateCode=ID&limit=1"
-
-	req, err := http.NewRequest(http.MethodGet, requestURL, nil)
-	req.Header.Add("X-Api-Key", apiKey)
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	req.Header.Add("X-Api-Key", conf.ApiKey)
 	req.Header.Add("accept", "application/json")
 	if err != nil {
 		log.Fatalf("Error creating request: %s", err)
@@ -49,8 +69,9 @@ func main() {
 		os.Exit(2)
 	}
 
-	err = ResponseToDB(resp, dbQuery)
+	err = ResponseToDB(resp, conf.dbQuery)
 	if err != nil {
 		log.Fatalf("error putting response into database: %v", err)
 	}
+	return nil
 }

@@ -13,6 +13,22 @@ import (
 	"github.com/google/uuid"
 )
 
+const checkExists = `-- name: CheckExists :one
+SELECT EXISTS (
+  SELECT  full_name
+  FROM parks
+  WHERE nps_id = $1
+  LIMIT 1
+)
+`
+
+func (q *Queries) CheckExists(ctx context.Context, npsID string) (bool, error) {
+	row := q.db.QueryRowContext(ctx, checkExists, npsID)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
 const createUser = `-- name: CreateUser :one
 INSERT INTO parks (id, nps_id, full_name, park_code, states, description, designation, activities, topics, details, created_at)
 VALUES (

@@ -14,3 +14,11 @@ VALUES (
   $11
 )
 RETURNING *;
+
+-- name: CheckExists :one
+SELECT EXISTS (
+  SELECT  full_name
+  FROM parks
+  WHERE nps_id = $1
+  LIMIT 1
+);

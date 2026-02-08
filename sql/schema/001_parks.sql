@@ -1,6 +1,7 @@
 -- +goose Up
 CREATE TABLE parks(
-  id UUID PRIMARY KEY, nps_id TEXT UNIQUE NOT NULL,
+  id UUID PRIMARY KEY, 
+  nps_id TEXT UNIQUE NOT NULL,
   full_name TEXT NOT NULL,
   park_code TEXT UNIQUE NOT NULL,
   states TEXT NOT NULL,

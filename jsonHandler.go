@@ -70,6 +70,14 @@ func jsonToStruct(res *http.Response) (NpsBody, error) {
 
 func structToDB(db *database.Queries, parks NpsBody) error {
 	for _, park := range parks.Data {
+		exists, err := db.CheckExists(context.Background(), park.ID)
+		if err != nil {
+			return err
+		}
+		if exists {
+			log.Printf("%s already exists.", park.FullName)
+			continue
+		}
 		details := ParkDetails{
 			WeatherInfo:    park.WeatherInfo,
 			Contacts:       park.Contacts,
@@ -98,12 +106,11 @@ func structToDB(db *database.Queries, parks NpsBody) error {
 			Details:     jsonDetails,
 			CreatedAt:   time.Now(),
 		}
-		DBpark, err := db.CreateUser(context.Background(), params)
+		_, err = db.CreateUser(context.Background(), params)
 		if err != nil {
 			return err
 		}
-		log.Println(DBpark)
-
+		log.Printf("Added %s to database\n", park.FullName)
 	}
 	return nil
 }
