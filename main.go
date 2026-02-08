@@ -36,9 +36,9 @@ func main() {
 		dbQuery: dbQuery,
 	}
 	limit := 50
-	start := 350
-	for start <= 2000 {
-		fmt.Println(start)
+	start := 0
+	for start <= 500 {
+		fmt.Printf("New request starting at entry %v", start)
 		requestURL := fmt.Sprintf("https://developer.nps.gov/api/v1/parks?limit=%d&start=%d", limit, start)
 		err = config.RequestParseAdd(requestURL)
 		if err != nil {
